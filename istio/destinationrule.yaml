@@ -2,6 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: httpbin
+  namespace: istio-system
 spec:
   host: httpbin
   subsets:
