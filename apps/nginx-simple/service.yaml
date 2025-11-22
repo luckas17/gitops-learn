@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2025-11-22T10:52:23Z"
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: webapp
+  name: webapp
+  namespace: default
+  resourceVersion: "13996"
+  uid: 3f61e700-893d-416b-bbf5-a270943f4445
+spec:
+  allocateLoadBalancerNodePorts: true
+  clusterIP: 10.43.66.220
+  clusterIPs:
+  - 10.43.66.220
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 31778
+    port: 8081
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: webapp
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 172.18.0.3
+      ipMode: VIP
+    - ip: 172.18.0.4
+      ipMode: VIP
+    - ip: 172.18.0.5
+      ipMode: VIP
