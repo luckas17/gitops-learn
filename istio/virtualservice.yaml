@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts: ["*"]
+  gateways: ["httpbin-gw"]
+  http:
+    - route:
+        - destination: { host: httpbin, subset: v1 }
