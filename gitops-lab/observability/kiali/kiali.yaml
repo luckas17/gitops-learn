@@ -29,10 +29,15 @@ rules:
   resources:
   - configmaps
   - endpoints
-  - namespaces
-  - nodes
-  - pods
   - pods/log
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
   - replicationcontrollers
   - services
   verbs:
@@ -45,7 +50,7 @@ rules:
   verbs:
   - create
   - post
-- apiGroups: ["apps"]
+- apiGroups: ["extensions", "apps"]
   resources:
   - daemonsets
   - deployments
@@ -63,43 +68,36 @@ rules:
   - get
   - list
   - watch
-- apiGroups: ["networking.istio.io"]
-  resources:
-  - destinationrules
-  - envoyfilters
-  - gateways
-  - serviceentries
-  - sidecars
-  - virtualservices
-  - workloadentries
-  - workloadgroups
+- apiGroups:
+  - networking.istio.io
+  - security.istio.io
+  resources: ["*"]
   verbs:
   - get
   - list
   - watch
-- apiGroups: ["security.istio.io"]
+- apiGroups: ["apps.openshift.io"]
   resources:
-  - authorizationpolicies
-  - peerauthentications
-  - requestauthentications
+  - deploymentconfigs
   verbs:
   - get
   - list
   - watch
-- apiGroups: ["telemetry.istio.io"]
+- apiGroups: ["project.openshift.io"]
   resources:
-  - telemetries
+  - projects
   verbs:
   - get
-  - list
-  - watch
-- apiGroups: ["extensions.istio.io"]
+- apiGroups: ["route.openshift.io"]
   resources:
-  - wasmplugins
+  - routes
   verbs:
   - get
-  - list
-  - watch
+- apiGroups: ["authentication.k8s.io"]
+  resources:
+  - tokenreviews
+  verbs:
+  - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
