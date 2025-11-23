@@ -71,6 +71,8 @@ rules:
 - apiGroups:
   - networking.istio.io
   - security.istio.io
+  - telemetry.istio.io
+  - extensions.istio.io
   resources: ["*"]
   verbs:
   - get
@@ -159,14 +161,14 @@ spec:
           containerPort: 20001
         readinessProbe:
           httpGet:
-            path: /kiali/healthz
+            path: /healthz
             port: api-port
             scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 30
         livenessProbe:
           httpGet:
-            path: /kiali/healthz
+            path: /healthz
             port: api-port
             scheme: HTTP
           initialDelaySeconds: 30
