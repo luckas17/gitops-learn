@@ -169,7 +169,7 @@ spec:
             path: /kiali/healthz
             port: api-port
             scheme: HTTP
-          initialDelaySeconds: 5
+          initialDelaySeconds: 30
           periodSeconds: 30
         resources:
           requests:
