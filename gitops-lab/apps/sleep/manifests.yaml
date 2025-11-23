@@ -5,7 +5,7 @@ items:
     metadata:
       annotations: {}
       name: sleep
-      namespace: default
+      namespace: workload
   - apiVersion: v1
     kind: Service
     metadata:
@@ -14,7 +14,7 @@ items:
         app: sleep
         service: sleep
       name: sleep
-      namespace: default
+      namespace: workload
     spec:
       internalTrafficPolicy: Cluster
       ipFamilies:
@@ -35,7 +35,7 @@ items:
       annotations:
         deployment.kubernetes.io/revision: "1"
       name: sleep
-      namespace: default
+      namespace: workload
     spec:
       replicas: 1
       selector:
@@ -67,7 +67,7 @@ items:
                   name: secret-volume
           dnsPolicy: ClusterFirst
           restartPolicy: Always
-          schedulerName: default-scheduler
+          schedulerName: workload-scheduler
           securityContext: {}
           serviceAccount: sleep
           serviceAccountName: sleep
@@ -75,7 +75,7 @@ items:
           volumes:
             - name: secret-volume
               secret:
-                defaultMode: 420
+                workloadMode: 420
                 optional: true
                 secretName: sleep-secret
 kind: List

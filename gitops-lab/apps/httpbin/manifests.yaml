@@ -5,7 +5,7 @@ items:
     metadata:
       annotations: {}
       name: httpbin
-      namespace: default
+      namespace: workload
   - apiVersion: v1
     kind: Service
     metadata:
@@ -14,7 +14,7 @@ items:
         app: httpbin
         service: httpbin
       name: httpbin
-      namespace: default
+      namespace: workload
     spec:
       internalTrafficPolicy: Cluster
       ipFamilies:
@@ -35,7 +35,7 @@ items:
       annotations:
         deployment.kubernetes.io/revision: "5"
       name: httpbin
-      namespace: default
+      namespace: workload
     spec:
       replicas: 1
       selector:
@@ -66,7 +66,7 @@ items:
               terminationMessagePolicy: File
           dnsPolicy: ClusterFirst
           restartPolicy: Always
-          schedulerName: default-scheduler
+          schedulerName: workload-scheduler
           securityContext: {}
           serviceAccount: httpbin
           serviceAccountName: httpbin
