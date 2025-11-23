@@ -19,6 +19,8 @@ data:
     external_services:
       istio:
         root_namespace: istio-system
+      prometheus:
+        url: "http://prom-prometheus-server.monitoring:80"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
