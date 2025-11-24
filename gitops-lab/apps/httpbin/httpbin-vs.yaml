@@ -6,7 +6,7 @@ spec:
   hosts:
     - "*"
   gateways:
-    - httpbin-gw
+    - istio-system/httpbin-gw
   http:
     - route:
         - destination:
