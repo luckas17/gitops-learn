@@ -4,6 +4,18 @@ metadata:
   name: httpbin
 spec:
   host: httpbin
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 10
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 100
   subsets:
     - name: v1
       labels:

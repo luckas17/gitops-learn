@@ -17,3 +17,8 @@ spec:
             host: httpbin
             subset: v2
           weight: 20
+      timeout: 10s
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: 5xx,reset,connect-failure

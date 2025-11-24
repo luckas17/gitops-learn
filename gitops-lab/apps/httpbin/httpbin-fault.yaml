@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpbin-fault
+spec:
+  hosts:
+    - httpbin
+  http:
+    - fault:
+        delay:
+          percentage:
+            value: 10
+          fixedDelay: 5s
+        abort:
+          percentage:
+            value: 5
+          httpStatus: 500
+      route:
+        - destination:
+            host: httpbin
+            subset: v1
