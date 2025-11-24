@@ -12,3 +12,8 @@ spec:
         - destination:
             host: httpbin
             subset: v1
+          weight: 80
+        - destination:
+            host: httpbin
+            subset: v2
+          weight: 20

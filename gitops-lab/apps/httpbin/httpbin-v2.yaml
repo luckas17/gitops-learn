@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin-v2
+  namespace: workload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: httpbin
+        version: v2
+    spec:
+      serviceAccountName: httpbin
+      containers:
+        - name: httpbin
+          image: kennethreitz/httpbin
+          ports:
+            - containerPort: 80
+          env:
+            - name: VERSION
+              value: "v2"
