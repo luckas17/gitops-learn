@@ -67,7 +67,6 @@ items:
                   name: secret-volume
           dnsPolicy: ClusterFirst
           restartPolicy: Always
-          schedulerName: workload-scheduler
           securityContext: {}
           serviceAccount: sleep
           serviceAccountName: sleep
@@ -75,7 +74,7 @@ items:
           volumes:
             - name: secret-volume
               secret:
-                workloadMode: 420
+                defaultMode: 420
                 optional: true
                 secretName: sleep-secret
 kind: List
