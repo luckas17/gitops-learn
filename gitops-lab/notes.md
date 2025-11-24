@@ -172,13 +172,242 @@ Pod sleep (with istio-proxy sidecar) ✅
 
 ---
 
+---
+
+## Istio Service Mesh - Use Cases Implementation
+
+### Setup Overview
+- **Namespace:** workload
+- **Services:** httpbin (v1 & v2), sleep
+- **Istio Injection:** ✅ Enabled
+- **Sidecar Proxy:** ✅ Running on all pods
+
+### 1. Security - mTLS (Mutual TLS)
+**Status:** ✅ Active (default)
+
+**What it does:**
+- Automatic encryption between services
+- Mutual authentication using SPIFFE identities
+- No code changes needed
+
+**Verification:**
+```bash
+kubectl exec -n workload deploy/sleep -- curl -s http://httpbin:8000/headers | grep X-Forwarded-Client-Cert
+```
+
+**Evidence:**
+```
+X-Forwarded-Client-Cert: By=spiffe://cluster.local/ns/workload/sa/httpbin;
+URI=spiffe://cluster.local/ns/workload/sa/sleep
+```
+
+---
+
+### 2. Traffic Management - Canary Deployment
+**Status:** ✅ Implemented (80% v1, 20% v2)
+
+**What it does:**
+- Gradual rollout of new version
+- Split traffic by percentage
+- Easy rollback if issues
+
+**Configuration:**
+```yaml
+# VirtualService
+http:
+  - route:
+      - destination:
+          host: httpbin
+          subset: v1
+        weight: 80
+      - destination:
+          host: httpbin
+          subset: v2
+        weight: 20
+```
+
+**Testing:**
+```bash
+for i in {1..50}; do kubectl exec -n workload deploy/sleep -- curl -s http://httpbin:8000/ip; done
+```
+
+**View in Kiali:** Graph shows traffic split between v1 and v2
+
+---
+
+### 3. Resilience - Retry & Timeout
+**Status:** ✅ Configured
+
+**What it does:**
+- Auto retry on failures (5xx, connection errors)
+- Prevent hanging requests with timeout
+- Improve reliability without code changes
+
+**Configuration:**
+```yaml
+# VirtualService
+http:
+  - route: [...]
+    timeout: 10s
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+      retryOn: 5xx,reset,connect-failure
+```
+
+**Behavior:**
+- Max 10s total timeout per request
+- Retry up to 3 times on errors
+- Each retry max 2s
+
+---
+
+### 4. Resilience - Circuit Breaker
+**Status:** ✅ Configured
+
+**What it does:**
+- Limit connections to prevent overload
+- Eject unhealthy pods automatically
+- Fail fast instead of cascading failures
+
+**Configuration:**
+```yaml
+# DestinationRule
+trafficPolicy:
+  connectionPool:
+    tcp:
+      maxConnections: 10
+    http:
+      http1MaxPendingRequests: 10
+      maxRequestsPerConnection: 2
+  outlierDetection:
+    consecutiveErrors: 3
+    interval: 30s
+    baseEjectionTime: 30s
+    maxEjectionPercent: 100
+```
+
+**Behavior:**
+- Max 10 concurrent connections
+- If pod fails 3 times → ejected for 30s
+- Prevents overwhelming failing pods
+
+---
+
+### 5. Testing - Fault Injection
+**Status:** ✅ Configured (optional, for chaos testing)
+
+**What it does:**
+- Inject delays to test timeout handling
+- Inject errors to test retry logic
+- Test resilience without breaking actual services
+
+**Configuration:**
+```yaml
+# VirtualService (httpbin-fault.yaml)
+http:
+  - fault:
+      delay:
+        percentage:
+          value: 10
+        fixedDelay: 5s
+      abort:
+        percentage:
+          value: 5
+        httpStatus: 500
+    route: [...]
+```
+
+**Behavior:**
+- 10% requests delayed by 5s
+- 5% requests return HTTP 500
+- Use for testing, not production
+
+---
+
+### 6. Observability - Automatic Metrics & Tracing
+**Status:** ✅ Active
+
+**What it does:**
+- Automatic metrics collection (latency, error rate, throughput)
+- Distributed tracing across services
+- Service graph visualization
+
+**Tools:**
+- **Kiali:** Service mesh graph, traffic flow
+- **Jaeger:** Distributed tracing
+- **Prometheus:** Metrics storage
+
+**Access:**
+```bash
+# Kiali
+kubectl port-forward -n istio-system svc/kiali 20001:20001
+# Open: http://localhost:20001
+
+# Jaeger
+kubectl port-forward -n istio-system svc/jaeger-query 16686:16686
+# Open: http://localhost:16686
+```
+
+---
+
+### Istio Components Explained
+
+**Gateway** = Entry point from outside cluster
+- Opens ports (80, 443)
+- Handles TLS termination
+- Like nginx/load balancer
+
+**VirtualService** = Routing rules
+- Where traffic goes (which service, which version)
+- Routing by path, headers, weights
+- Retry, timeout, fault injection
+
+**DestinationRule** = Destination policies
+- Define subsets (v1, v2, v3)
+- Load balancing strategy
+- Circuit breaker, connection pool
+
+**Analogy:**
+```
+Gateway = Pintu masuk mall
+VirtualService = Petunjuk arah ("Toko A lantai 2, 80% ke kasir lama, 20% ke kasir baru")
+DestinationRule = Aturan toko ("Kasir lama = yang pakai seragam merah, max 10 antrian")
+```
+
+---
+
+### Traffic Flow
+
+**Internal (service-to-service):**
+```
+sleep pod → istio-proxy sidecar → mTLS → istio-proxy sidecar → httpbin pod
+```
+
+**External (via Gateway):**
+```
+Internet → Ingress Gateway Pod → Gateway Resource → VirtualService → DestinationRule → httpbin pod
+```
+
+---
+
+### Key Benefits
+
+1. **No code changes** - All features via configuration
+2. **Consistent policies** - Same retry/timeout for all services
+3. **Automatic security** - mTLS by default
+4. **Observability** - Metrics & tracing out of the box
+5. **Traffic control** - Canary, A/B testing, blue-green
+6. **Resilience** - Retry, timeout, circuit breaker
+
+---
+
 ## Next Steps
 
-1. Install Istio Ingress Gateway deployment
-2. Test external access via Gateway
-3. Access Kiali UI untuk visualisasi service mesh
-4. Setup port-forward untuk akses Kiali:
-   ```bash
-   kubectl port-forward -n istio-system svc/kiali 20001:20001
-   ```
-5. Test traffic policies (retry, timeout, circuit breaker)
+1. ~~Install Istio Ingress Gateway deployment~~ (optional, for external access)
+2. ~~Test external access via Gateway~~
+3. ✅ Access Kiali UI untuk visualisasi service mesh
+4. ✅ Implement canary deployment (80/20 split)
+5. ✅ Configure retry, timeout, circuit breaker
+6. Test fault injection untuk chaos engineering
+7. Monitor metrics di Kiali & Jaeger
