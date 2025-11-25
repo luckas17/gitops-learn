@@ -6,6 +6,20 @@ items:
       annotations: {}
       name: httpbin
       namespace: workload
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: httpbin
+      namespace: workload
+      labels:
+        app: httpbin
+    spec:
+      ports:
+        - name: http
+          port: 8000
+          targetPort: 80
+      selector:
+        app: httpbin
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
