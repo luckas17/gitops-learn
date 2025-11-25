@@ -4,8 +4,7 @@ metadata:
   name: httpbin
 spec:
   hosts:
-    - httpbin-v1
-    - httpbin-v2
+    - httpbin
   gateways:
     - mesh
   http:
