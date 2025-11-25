@@ -4,7 +4,7 @@ metadata:
   name: httpbin
 spec:
   hosts:
-    - httpbin
+    - httpbin.workload.svc.cluster.local
   gateways:
     - mesh
   http:
