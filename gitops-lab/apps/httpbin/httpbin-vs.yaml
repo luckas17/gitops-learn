@@ -4,18 +4,21 @@ metadata:
   name: httpbin
 spec:
   hosts:
-    - httpbin.workload.svc.cluster.local
+    - httpbin-v1
+    - httpbin-v2
   gateways:
     - mesh
   http:
     - route:
         - destination:
-            host: httpbin
-            subset: v1
+            host: httpbin-v1
+            port:
+              number: 8000
           weight: 80
         - destination:
-            host: httpbin
-            subset: v2
+            host: httpbin-v2
+            port:
+              number: 8000
           weight: 20
       timeout: 10s
       retries:
