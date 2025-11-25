@@ -5,8 +5,10 @@ metadata:
 spec:
   hosts:
     - "*"
+    - httpbin
   gateways:
     - istio-system/httpbin-gw
+    - mesh
   http:
     - route:
         - destination:

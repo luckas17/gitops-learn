@@ -9,7 +9,7 @@ show_menu() {
     echo "Istio Service Mesh - Use Case Testing"
     echo "=========================================="
     echo "1. Test mTLS (Mutual TLS)"
-    echo "2. Test Canary Deployment (80/20 split)"
+    echo "2. Test Canary Deployment (custom split)"
     echo "3. Test Timeout"
     echo "4. Test Retry Policy"
     echo "5. Test Circuit Breaker"
@@ -38,6 +38,18 @@ test_canary() {
     echo ""
     echo "Testing Canary Deployment..."
     echo "----------------------------"
+    echo -n "Enter v1/v2 split (e.g., 80/20): "
+    read split
+    
+    v1_percent=$(echo $split | cut -d'/' -f1)
+    v2_percent=$(echo $split | cut -d'/' -f2)
+    
+    if ! [[ "$v1_percent" =~ ^[0-9]+$ ]] || ! [[ "$v2_percent" =~ ^[0-9]+$ ]] || [ $((v1_percent + v2_percent)) -ne 100 ]; then
+        echo "❌ Invalid split. Using default 80/20"
+        v1_percent=80
+        v2_percent=20
+    fi
+    
     echo "Sending 100 requests..."
     v1=0
     v2=0
@@ -52,8 +64,8 @@ test_canary() {
     done
     echo ""
     echo "Results:"
-    echo "  v1: $v1 requests (~80% expected)"
-    echo "  v2: $v2 requests (~20% expected)"
+    echo "  v1: $v1 requests (~${v1_percent}% expected)"
+    echo "  v2: $v2 requests (~${v2_percent}% expected)"
     echo "✅ Canary working"
 }
 
