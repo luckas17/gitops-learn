@@ -411,3 +411,9 @@ Internet → Ingress Gateway Pod → Gateway Resource → VirtualService → Des
 5. ✅ Configure retry, timeout, circuit breaker
 6. Test fault injection untuk chaos engineering
 7. Monitor metrics di Kiali & Jaeger
+
+
+## Test traffic canary
+```bash
+kubectl delete pod -n workload -l app=sleep && sleep 10 && SLEEP_POD=$(kubectl get pod -n workload -l app=sleep -o jsonpath='{.items[0].metadata.name}') && echo "Sending 100 requests..." && for i in {1..100}; do kubectl exec -n workload $SLEEP_POD -- curl -s http://httpbin:8000/get > /dev/null 2>&1; done && echo "Results:" && kubectl exec -n workload $SLEEP_POD -c istio-proxy -- curl -s localhost:15000/clusters | grep "httpbin-v.*rq_success"
+```
