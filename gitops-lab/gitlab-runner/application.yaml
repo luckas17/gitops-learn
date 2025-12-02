@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.gitlab.io
+    chart: gitlab-runner
+    targetRevision: 0.69.0
+    helm:
+      values: |
+        gitlabUrl: https://gitlab.com/
+        runnerToken: "glrt-CLMdaDoE1MyQWA8B8aLAfW86MQpwOjE5cGE1ZQp0OjMKdTo3M3Q4MBg.01.1j1w3cu5q"
+        
+        runners:
+          config: |
+            [[runners]]
+              [runners.kubernetes]
+                namespace = "{{.Release.Namespace}}"
+                image = "alpine:3.19"
+                privileged = false
+                helper_image = "gitlab/gitlab-runner-helper:alpine-latest"
+          
+          executor: kubernetes
+          tags: "k3d,kubernetes,lightweight"
+          runUntagged: true
+          locked: false
+        
+        rbac:
+          create: true
+        
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitlab-runner
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
