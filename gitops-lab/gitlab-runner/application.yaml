@@ -12,7 +12,6 @@ spec:
     helm:
       values: |
         gitlabUrl: https://gitlab.com/
-        runnerToken: "glrt-CLMdaDoE1MyQWA8B8aLAfW86MQpwOjE5cGE1ZQp0OjMKdTo3M3Q4MBg.01.1j1w3cu5q"
         
         runners:
           config: |
@@ -27,6 +26,7 @@ spec:
           tags: "k3d,kubernetes,lightweight"
           runUntagged: true
           locked: false
+          secret: gitlab-runner-token
         
         rbac:
           create: true
