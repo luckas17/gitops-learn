@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner-rbac
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/luckas17/gitops-learn.git
+    targetRevision: HEAD
+    path: gitops-lab/gitlab-runner
+    directory:
+      include: rbac-deploy.yaml
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
